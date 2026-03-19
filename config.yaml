@@ -1,0 +1,208 @@
+# ABAC Newsletter Skill Configuration
+# 👉 CUSTOMIZE ALL VALUES BELOW FOR YOUR TEAM
+
+# Basic Team Info
+team: CXI  # Your team name
+schedule: biweekly  # Options: weekly, biweekly, monthly
+timezone: America/Los_Angeles  # Your timezone
+
+# Reviewers
+# 👉 UPDATE with your actual reviewer emails
+reviewers:
+  primary: kevin.baron@databricks.com  # Primary reviewer (required)
+  secondary: samira.emmerson@databricks.com  # Secondary reviewer (optional)
+  cc:  # Optional: Additional people to CC
+    - nilesh.bhide@databricks.com
+    - manoj@databricks.com
+
+# Data Sources Configuration
+data_sources:
+  # Google Calendar Configuration
+  meetings:
+    calendar_id: "kevin.baron@databricks.com"  # Using your primary Google Calendar
+    # Meeting keywords to search for
+    keywords:
+      - "CXI Stand up"
+      - "CXI Sprint Planning"
+      - "CXI Sprint Review"
+      - CXI
+    days_back: 14  # How many days to look back for meetings
+
+  # JIRA Configuration
+  jira:
+    project_key: PLAT  # CXI project
+    # JQL query for UC tickets
+    custom_jql: "project = PLAT AND component = 'Support Platform' AND (status = 'In Progress' OR updated >= -14d) ORDER BY priority DESC"
+    # Optional: Specific statuses to highlight
+    highlight_statuses:
+      - "To Do"
+      - "In Progress"
+      - "In Review"
+      - "Done"
+    # Optional: Priority levels to track
+    track_priorities:
+      - "Highest"
+      - "High"
+      - "Medium"
+
+  # Slack Configuration
+  slack:
+    # Your team's Slack channels
+    channels:
+      - support-automation
+      - support-agent-internal
+      - eng-support-automation
+      - allhands-support
+    # Optional: Filter messages by emoji reactions
+    # 👉 CUSTOMIZE which emojis indicate important updates
+    reaction_filter:
+      - heart-eng   # 🎉 Celebrations/launches
+      - rocket      # 🚀 Shipped features
+      - star        # ⭐ Important decisions
+      - plus1        # 👀 Needs attention
+    days_back: 14  # How many days to look back
+    min_reactions: 2  # Minimum reactions to include message
+
+# Output Configuration
+output:
+  # 👉 CHOOSE: google_doc, email, or markdown
+  format: google_doc  # Options: google_doc, email, markdown
+
+  # Google Drive Settings (if format = google_doc)
+  google_drive:
+    # 👉 CHANGE TO YOUR TEAM'S NEWSLETTER FOLDER ID
+    # (Get this from the folder URL: drive.google.com/drive/folders/{FOLDER_ID})
+    folder_id: "15N7jxMSBzLpqVb92TxxZbTneCQUm9-tD"
+
+    # 👉 CRITICAL: Create a formatted Google Doc template with:
+    #    - Purple table headers (#5B3A8F)
+    #    - Colored status indicators
+    #    - All sections/tables pre-formatted
+    #    - Placeholder text to be replaced
+    # Then paste the template doc ID here (from URL: docs.google.com/document/d/{TEMPLATE_ID})
+    template_id: "1_Wqcl7rmWHME4vGkKiCLs-3BXIdYE7gH7wbxuzW27ys"
+
+  # Email Settings (if format = email)
+  email:
+    subject_format: "{team} Executive Summary - {date}"  # Template for email subject
+    from_name: "CXI Team"  # Display name for sender
+
+  # Slack Notification Settings
+  slack_notification:
+    enabled: true  # Set to false to disable Slack notifications
+    # 👉 CHANGE TO YOUR TEAM'S LEADERSHIP/ANNOUNCEMENT CHANNEL
+    channel: "#support-automation"
+    message_template: "📰 {team} Executive Summary draft ready for review: {link}"
+
+# Template Configuration
+# NOTE: These markdown templates are not used in the Google Doc workflow.
+# The Google Doc template (output.google_drive.template_id) is the actual template.
+# templates:
+#   weekly: "assets/templates/weekly-template.md"
+#   monthly: "assets/templates/monthly-template.md"
+
+  # Optional: Custom templates for specific audiences
+  # executive: "assets/templates/executive-template.md"
+  # engineering: "assets/templates/engineering-template.md"
+
+# Metrics Configuration
+# 👉 CUSTOMIZE which metrics to track and display
+metrics:
+  # Delivery Metrics
+  delivery:
+    - name: "Sprint Points Completed"
+      source: "jira"  # Where to get this metric
+      jql_field: "Story Points"  # Custom field in JIRA
+    - name: "Features Shipped"
+      source: "jira"
+      count_status: "Done"
+    - name: "Bugs Closed"
+      source: "jira"
+      count_issuetype: "Bug"
+
+  # Quality Metrics
+  quality:
+    - name: "P0 Incidents"
+      source: "jira"
+      count_priority: "Highest"
+      count_issuetype: "Incident"
+    - name: "API Uptime"
+      source: "external"  # From monitoring dashboard
+      dashboard_url: "https://grafana.example.com/dashboard"
+
+  # Customer Metrics (if applicable)
+  customer:
+    - name: "Active Users"
+      source: "dashboard"
+      dashboard_url: "https://analytics.example.com"
+    - name: "Support Tickets"
+      source: "jira"
+      project_key: "SUPPORT"
+
+# Advanced Settings
+advanced:
+  # Automatically detect launches/milestones from JIRA
+  auto_detect_launches:
+    enabled: true
+    # JIRA labels that indicate a launch
+    launch_labels:
+      - "GA"
+      - "Private-Preview"
+      - "Public-Preview"
+
+  # Automatically detect blockers
+  auto_detect_blockers:
+    enabled: true
+    # Issues with these labels/priorities are auto-flagged as blockers
+    blocker_labels:
+      - "blocker"
+      - "escalation"
+    blocker_priorities:
+      - "Highest"
+
+  # Content generation preferences
+  content_generation:
+    max_highlights: 4  # Maximum number of key highlights
+    max_blockers: 3    # Maximum number of blockers to show
+    include_metrics_trends: true  # Show ↑/↓ trends
+    include_customer_quotes: false  # Pull from support tickets (experimental)
+
+# Links Configuration
+# 👉 UPDATE with your team's actual links
+links:
+  go_link: "go/cxi"  # Main team update link
+  faq_link: "go/cxi"   # FAQ link
+  dashboard_link: "https://dashboard.example.com/abac"  # Metrics dashboard
+  roadmap_link: "https://databricks.atlassian.net/wiki/spaces/UN/embed/6081610365?atl_f=PAGETREE"      # Roadmap link
+  feedback_email: "cxi-team@company.com"  # Team email for feedback
+
+# Customization Examples for Different Teams
+# Uncomment and modify for your use case:
+
+# Example 1: Data Team
+# team: Data Platform
+# data_sources:
+#   jira:
+#     project_key: DATA
+#   slack:
+#     channels:
+#       - data-engineering
+#       - data-science
+
+# Example 2: Mobile Team
+# team: Mobile Apps
+# metrics:
+#   quality:
+#     - name: "Crash-Free Rate"
+#       source: "firebase"
+#     - name: "App Store Rating"
+#       source: "app_store_connect"
+
+# Example 3: Infrastructure Team
+# team: Infrastructure
+# metrics:
+#   quality:
+#     - name: "System Uptime"
+#       source: "prometheus"
+#     - name: "Incident Response Time"
+#       source: "pagerduty"
