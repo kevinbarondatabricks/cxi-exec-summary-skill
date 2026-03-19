@@ -47,6 +47,8 @@ Automatically generates executive-ready newsletter summaries by aggregating upda
    - Extract: Current quarter goals, key milestones, strategic priorities, and OKRs
    - Use this as the lens for interpreting and prioritizing all subsequent data (JIRA, Slack, meetings)
    - Frame exec summary highlights in terms of roadmap progress
+   - Map each Roadmap Objective to its JIRA Epic (product area) using `roadmap_to_epic_mapping` in config.yaml
+   - Group JIRA tickets by Epic, then report progress under the corresponding Roadmap Objective
 
 ---
 

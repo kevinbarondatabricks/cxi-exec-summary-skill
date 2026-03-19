@@ -45,6 +45,20 @@ data_sources:
       - "High"
       - "Medium"
 
+    # Roadmap-to-JIRA Mapping
+    # Each Epic on the Support Platform board represents a product area.
+    # Each Roadmap Objective maps to one of these product areas.
+    # When building the exec summary, group JIRA tickets by their Epic,
+    # then frame progress in terms of the corresponding Roadmap Objective.
+    #
+    # 👉 UPDATE this mapping when roadmap objectives or product areas change.
+    roadmap_to_epic_mapping:
+      # Roadmap Objective → JIRA Epic (product area)
+      "Automatic Diagnostic Collection (DBSQL)": "Merlin"
+      "Governed Execution Plane": "Support Tooling MCP"
+      "Isaac Investigation Surface": "Support Agent"
+      "Support Tooling Backend Service": "Support Tooling Service"
+
   # Slack Configuration
   slack:
     # Your team's Slack channels
