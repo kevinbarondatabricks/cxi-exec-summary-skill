@@ -1,18 +1,15 @@
 ---
 name: cxi-exec-summary
-# 👉 CUSTOMIZE: Update the description to match YOUR team's workflow
-# Be specific and "pushy" so Claude triggers this skill automatically
 description: >
   IMMEDIATELY activate when user says "build CXI exec summary", "create CXI biweekly update",
   "generate exec summary for CXI", or mentions CXI executive updates. Automatically
   aggregate context from Google Docs, JIRA tickets, meetings, and Slack without asking for
-  confirmation. This is a recurring workflow—be proactive.
-# 👉 CUSTOMIZE: Add trigger phrases your team uses
+  confirmation. This is a recurring workflow - be proactive.
 triggers:
   - CXI Executive Summary
   - CXI exec summary
   - CXI biweekly update
-version: 1.0.0
+version: 1.1.0
 author: Kevin Baron-Quijano <kevin.baron@databricks.com>
 ---
 
@@ -20,23 +17,32 @@ author: Kevin Baron-Quijano <kevin.baron@databricks.com>
 
 ## What This Skill Does
 Automatically generates executive-ready newsletter summaries by aggregating updates from:
-- Team Notes (from Goole Suite via MCP)
-- 🎫 JIRA tickets (via MCP JIRA connection)
-- 📅 Meeting notes (from Google Calendar via MCP)
-- 💬 Slack discussions (via MCP Slack connection)
+- Team Notes (from Google Suite via MCP)
+- JIRA tickets (via MCP JIRA connection)
+- Meeting notes (from Google Calendar via MCP)
+- Slack discussions (via MCP Slack connection)
 
-**Output:** Formatted Google Doc or email draft ready for review.
+**Output:** Formatted Google Doc ready for review.
 
-> **⚠️ CRITICAL: No hallucination policy.** If information for any section cannot be verified from the sources searched (JIRA, Slack, Google Docs, Calendar), do NOT fabricate or infer content. Instead, include the section header with: `⚠️ CONFIRM MANUALLY — data not found in sources.` Always err on the side of leaving a section for manual review rather than generating unverified content. This applies to every section, including Roadmap status, Impact Signal metrics, What's Next items, and Ideas around Innovation from Support.
+> **CRITICAL: No hallucination policy.** If information for any section cannot be verified from the sources searched (JIRA, Slack, Google Docs, Calendar), do NOT fabricate or infer content. Instead, include the section header with: `CONFIRM MANUALLY - data not found in sources.` Always err on the side of leaving a section for manual review rather than generating unverified content. This applies to every section, including Roadmap status, Impact Signal metrics, What's Next items, and Ideas around Innovation from Support.
 
----
+## Output Formatting Rules
+
+These rules apply to ALL generated content in the Google Doc:
+
+1. **Headers:** All section headers must be Heading 2, Arial, 16px, Bold
+2. **No dividers:** Do not insert horizontal rules (`---`) or visual separators between sections
+3. **No emojis:** Do not use emojis anywhere in the output - not in headers, not in TL;DR status, not in tables. Use bold plain text instead (e.g., **On Track** not a green circle emoji)
+4. **Bold key points:** Emphasize deliverable names, metric values, status labels, and other key points in **bold**
+5. **No em dashes:** Never use em dashes. Use regular dashes (-) or semicolons (;) instead
+6. **TL;DR status format:** **On Track** / **Needs Attention** / **Off Track** (plain text, bold, no emojis)
+7. **Roadmap status format:** **On Track** / **At Risk** / **Blocked** / **Deferred** (plain text, bold, no emojis)
+8. **Paragraph spacing:** Add blank lines between paragraphs in What Shipped and Highlights sections for visual breathing room
 
 ## When to Use
 - User requests CXI Executive Summary
 - Time for recurring newsletter (check `config.yaml` for schedule)
 - Ad-hoc executive summary needed
-
----
 
 ## Workflow
 
@@ -52,101 +58,73 @@ Automatically generates executive-ready newsletter summaries by aggregating upda
    - Map each Roadmap Objective to its JIRA Epic (product area) using `roadmap_to_epic_mapping` in config.yaml
    - Group JIRA tickets by Epic, then report progress under the corresponding Roadmap Objective
 
----
-
 ### Phase 1: Context Aggregation
 **Goal:** Gather raw updates from all sources
 
-1. **Meeting Notes**
+1. **Meeting Notes (Calendar)**
    - Use: `mcp__google__calendar_event_list` tool
    - Query: Events from last 14 days matching configured keywords
    - Extract: Action items, decisions, key discussions
 
-   ```
-   # 👉 CUSTOMIZE in config.yaml:
-   # - calendar_id: Your team's calendar
-   # - keywords: Your meeting name patterns
-   ```
+2. **Meeting Notes (Gemini Email Summaries)**
+   - Use: `mcp__google__google_read_api_call` with endpoint `gmail/messages`
+   - Query: `in:anywhere from:me subject:(notes of CXI) newer_than:14d`
+   - The `in:anywhere` clause ensures Trash and Spam are included in the search
+   - These are Gemini-generated meeting summaries emailed after CXI calls
+   - Extract: Key discussion points, action items, decisions captured by Gemini
+   - Cross-reference with Calendar events to fill gaps in meeting notes
 
-2. **JIRA Tickets**
+3. **JIRA Tickets**
    - Use: `mcp__jira__jira_read_api_call` with endpoint `issues.search`
    - Query: `project = PLAT AND component = 'Support Platform' AND (status IN ("To Do","In Progress","In Review") OR updated >= -14d)`
    - Board: [Support Platform (board 6475)](https://databricks.atlassian.net/jira/software/c/projects/PLAT/boards/6475)
    - Prioritize: High-priority items, blockers
 
-   ```
-   # 👉 CUSTOMIZE in config.yaml:
-   # - project_key: Your JIRA project (e.g., PLATFORM, DATA)
-   # - custom_jql: Your team's specific query
-   ```
-
 3. **Slack Updates**
    - Use: `mcp__slack__slack_read_api_call` with endpoint `search.messages`
    - Strategy: Keyword-based search ("CXI", "support automation", "Isaac") across all channels, supplemented by `conversations.history` on configured channels
    - Channels: `#support-automation`, `#support-agent-internal`, `#eng-support-automation`, `#allhands-support`
-   - Filter: Prioritize message content and relevance over reactions. Emoji reactions are a supplementary signal only — do not use them as a primary filter for inclusion
-
-   ```
-   # 👉 CUSTOMIZE in config.yaml:
-   # - channels: Your team's Slack channels
-   # - reaction_filter: Emojis that indicate important updates
-   ```
+   - Filter: Prioritize message content and relevance over reactions. Emoji reactions are a supplementary signal only; do not use them as a primary filter for inclusion
 
 **Output:** Aggregated data structured by source
-
----
 
 ### Phase 2: Content Structuring
 **Goal:** Transform raw data into narrative format
 
 1. **Apply Template**
    - Use: `assets/templates/biweekly-template.md`
-   - Sections: Q1 Goal, TL;DR, Progress Narrative, What this unlocks, Risks/Gaps/Asks, Impact Signal, Highlights, What's Next, Roadmap
+   - Sections: TL;DR, What Shipped, What this unlocks, Impact Signal, Risks / Gaps, Asks, Highlights, What's Next, Roadmap
    - See `references/domain-context.md` for writing style guidance per section
-
-   ```
-   # 👉 CUSTOMIZE templates in assets/templates/:
-   # - Add/remove sections based on your team's needs
-   # - Update metrics to track what matters to your stakeholders
-   ```
 
 2. **Follow Best Practices**
    - See: `references/domain-context.md#writing-style`
    - Exec-friendly: Focus on impact, not implementation details
    - Quantify results where possible
 
-3. **Format for Medium**
+3. **Follow Output Formatting Rules** (see above)
+   - No emojis anywhere
+   - No em dashes; use regular dashes and semicolons
+   - Bold key points throughout
+   - All headers: Heading 2, Arial, 16px, Bold
+   - No dividers between sections
+
+4. **Format for Medium**
    - **Google Doc (RECOMMENDED):** Use template-based approach
      1. Copy pre-formatted template: `mcp__google__drive_file_copy`
      2. Replace content: `mcp__google__docs_document_batch_update` with `replaceAllText` requests
      3. IMPORTANT: Use plain text only - NO HTML tags (they render as literal text)
    - **Email:** Use `mcp__google__gmail_message_send`
 
-   ```
-   # 👉 CUSTOMIZE in config.yaml:
-   # - output.format: Choose google_doc, email, or markdown
-   # - output.google_drive.template_id: Your formatted template doc ID
-   # - google_drive_folder_id: Where to save newsletters
-   ```
-
 **Output:** Structured draft with all sections populated
 
----
-
-### Phase 3: Review & Delivery
+### Phase 3: Review and Delivery
 **Goal:** Finalize and distribute
 
 1. **Generate Draft Using Template**
    - Copy template: `mcp__google__drive_file_copy` with `template_id` from config.yaml
    - Update title: Use `replaceAllText` to set date/week
    - Replace content sections: Use multiple `replaceAllText` requests (NO HTML tags!)
-   - All formatting (purple headers, colored tables, etc.) is preserved from template
-
-   ```
-   # 👉 CUSTOMIZE in config.yaml:
-   # - output.google_drive.template_id: Your formatted template Google Doc ID
-   # - google_drive_folder_id: Your team's newsletter folder
-   ```
+   - All formatting (headers, tables, etc.) is preserved from template
 
    **CRITICAL:** Never use HTML tags like `<b>`, `<table>`, etc. in `replaceAllText`
    - They render as literal text, not formatting
@@ -157,25 +135,12 @@ Automatically generates executive-ready newsletter summaries by aggregating upda
    - Primary: kevin.baron@databricks.com (from `config.yaml`)
    - Secondary: samira.emmerson@databricks.com
 
-   ```
-   # 👉 CUSTOMIZE in config.yaml:
-   # - reviewers.primary: Your primary reviewer's email
-   # - reviewers.secondary: Your secondary reviewer's email
-   ```
-
 3. **Send Notification**
    - Post to Slack using `mcp__slack__slack_write_api_call` with endpoint `chat.postMessage`
    - Channel: From `config.yaml` (e.g., `#support-automation`)
-   - Format: "📰 CXI Executive Summary draft ready for review: {LINK}"
-
-   ```
-   # 👉 CUSTOMIZE in config.yaml:
-   # - slack_notification_channel: Where to post completion notice
-   ```
+   - Format: "CXI Executive Summary draft ready for review: {LINK}"
 
 **Output:** Published draft URL + confirmation
-
----
 
 ## Success Criteria
 
@@ -185,61 +150,65 @@ User: "Build the CXI exec summary"
 ```
 
 ### Expected Output
-1. ✅ Google Doc created with title "CXI Executive Summary - [date range]"
-2. ✅ Contains:
-   - Q1 Goal — one sentence anchoring the quarterly objective
-   - TL;DR — 🟢/🟡/🔴 status + one sentence; derived from Roadmap and Risks/Gaps/Asks state
-   - Progress Narrative — what moved this sprint, tied to the Q1 goal
-   - What this unlocks — impact framing (bullet list)
-   - Risks / Gaps / Asks — dependencies, constraints, and cross-functional requests
-   - Impact Signal — metrics with baselines and targets
-   - Highlights — demos, deliverables, recordings/links
-   - What's Next — concrete next-sprint items; if no data found, include the section header with a note to fill in manually before sending
-   - Roadmap — table of roadmap objectives with Status and Progress updated from JIRA epic state via `roadmap_to_epic_mapping`
-3. ✅ Reviewers tagged and notified
-4. ✅ Link shared in Slack
+1. Google Doc created with title "CXI Executive Summary - [date range]"
+2. Contains:
+   - TL;DR - **On Track** / **Needs Attention** / **Off Track** status + one sentence; derived from Roadmap, Risks / Gaps, and Asks state
+   - What Shipped - what moved this sprint, tied to the quarterly goal; space between paragraphs
+   - What this unlocks - impact framing (bullet list)
+   - Ideas around Innovation from Support - Aha! ideas table (manual fill)
+   - Impact Signal - metrics with baselines and targets
+   - Risks / Gaps - dependencies and constraints
+   - Asks - cross-functional requests with who, what, and when
+   - Highlights - demos, deliverables, recordings/links; space between paragraphs
+   - What's Next - concrete next-sprint items; if no data found, include the section header with a note to fill in manually before sending
+   - Roadmap - table of roadmap objectives with Status and Progress updated from JIRA epic state via `roadmap_to_epic_mapping`
+3. No emojis anywhere in the document
+4. No em dashes; only regular dashes and semicolons
+5. All headers: Heading 2, Arial, 16px, Bold
+6. Key points bolded throughout
+7. No horizontal dividers between sections
+8. Reviewers tagged and notified
+9. Link shared in Slack
 
 ### Sample Generated Content
 ```markdown
 # CXI Executive Summary - March 19, 2026
 
-## Q1 Goal
-Make DBSQL support executable: deliver the first usable, measurable agent-assisted
-investigation workflow for DBSQL.
-
 ## TL;DR
-🟢 On Track — All roadmap items progressing; one ask pending from IT (Salesforce write access) but not blocking current sprint.
+**On Track** - All roadmap items progressing; one ask pending from IT (Salesforce write access) but not blocking current sprint.
 
 ## What Shipped
-Sprint 3 delivered Support Agent MCP integration and Merlin auto-collection for
-DBSQL workspace diagnostics.
+Sprint 3 delivered **Support Agent MCP integration** and **Merlin auto-collection** for DBSQL workspace diagnostics.
 
-What this unlocks:
+The integration enables TSEs to run diagnostic workflows directly from the agent interface, closing the loop on the Q1 goal of making DBSQL support executable.
+
+**What this unlocks:**
 - TSEs can trigger diagnostic collection without manual steps
 - Isaac-based investigation is now measurable end-to-end
 
 ### Ideas around Innovation from Support
 | Idea | Submitted By | Outcome |
 |------|-------------|---------|
-| Auto-collect DBSQL query plans on case creation | @jane-doe (FL DBSQL) | ✅ Shipped in Merlin v2 |
-| Custom diagnostic templates per product area | @john-smith (BL) | ⏸️ Not now — scope too broad for Q1; revisit in Q2 prioritization |
+| Auto-collect DBSQL query plans on case creation | @jane-doe (FL DBSQL) | Shipped in Merlin v2 |
+| Custom diagnostic templates per product area | @john-smith (BL) | Not now - scope too broad for Q1; revisit in Q2 prioritization |
 
 Spotlight: @jane-doe's query plan gap feedback shaped Merlin's collection logic.
 
 ## Impact Signal
-- TTM baseline: 5.1 days — targeting 5% improvement by end of Q1
-- AI SAT eval pass rate: 72% (↑ from 65% last sprint)
+- **TTM baseline:** 5.1 days; targeting 5% improvement by end of Q1
+- **AI SAT eval pass rate:** 72% (up from 65% last sprint)
 
-## Risks / Gaps / Asks
+## Risks / Gaps
 No material blockers. Key dependencies:
 - IT / BSE for Salesforce write integration
 
-Asks:
-- Ask (IT): Prioritize Salesforce write access by April 1 for Phase 2 rollout
+## Asks
+- **Ask (IT):** Prioritize Salesforce write access by April 1 for Phase 2 rollout
 
 ## Highlights
-March 16 demo with TSEs: Support Agent + TSE-facing evaluation UI for NBA,
-case summarization, similar cases and AI-SAT.
+**March 16 demo with TSEs** - Support Agent + TSE-facing evaluation UI for NBA, case summarization, similar cases and AI-SAT.
+
+**Merlin DBSQL Auto-Collection** - First version of DBSQL diagnostic collection is now live from minimal customer input.
 
 ## What's Next
 - Isaac agent rollout to tier-2 DBSQL support
@@ -248,13 +217,11 @@ case summarization, similar cases and AI-SAT.
 ## Roadmap
 | Roadmap Objective | Status | Progress |
 |-------------------|--------|----------|
-| Automatic Diagnostic Collection (DBSQL) | 🟢 On Track | Merlin v2 shipped; auto-collection live |
-| Governed Execution Plane | 🟡 At Risk | MCP integration PR in review; blocked on auth |
-| Isaac Investigation Surface | 🟢 On Track | Support Agent measurable end-to-end |
-| Support Tooling Backend Service | ⏸️ Deferred | Deprioritized for Q1; revisit Q2 |
+| Automatic Diagnostic Collection (DBSQL) | **On Track** | Merlin v2 shipped; auto-collection live |
+| Governed Execution Plane | **At Risk** | MCP integration PR in review; blocked on auth |
+| Isaac Investigation Surface | **On Track** | Support Agent measurable end-to-end |
+| Support Tooling Backend Service | **Deferred** | Deprioritized for Q1; revisit Q2 |
 ```
-
----
 
 ## Configuration
 
@@ -273,7 +240,7 @@ Ensure these MCP servers are configured in your Claude Code settings:
 ```
 
 ### Skill Configuration
-**👉 EDIT `config.yaml` with your team's details:**
+**EDIT `config.yaml` with your team's details:**
 
 ```yaml
 team: CXI
@@ -307,18 +274,14 @@ output:
   slack_notification_channel: "#support-automation"
 ```
 
----
-
 ## Troubleshooting
 
 ### Common Issues
-- **"No meeting notes found"** → Check `calendar_id` in `config.yaml`
-- **"JIRA query returned 0 tickets"** → Verify `project_key` matches your JIRA project
-- **"Slack scraper failed"** → Ensure MCP Slack connection is authenticated
+- **"No meeting notes found"** - Check `calendar_id` in `config.yaml`
+- **"JIRA query returned 0 tickets"** - Verify `project_key` matches your JIRA project
+- **"Slack scraper failed"** - Ensure MCP Slack connection is authenticated
 
 See `references/mcp-integration.md#troubleshooting` for detailed solutions.
-
----
 
 ## Extending This Skill
 
@@ -334,21 +297,17 @@ See `references/mcp-integration.md#troubleshooting` for detailed solutions.
 3. Update `config.yaml` to point to new template
 4. Test with: "Build CXI exec summary using custom template"
 
----
-
 ## Quick Start Customization Checklist
 
 Before using this skill, update:
 
 - [x] YAML frontmatter: `name`, `description`, `triggers`, `author`
-- [x] `config.yaml`: All team-specific values (see 👉 markers)
-- [ ] `assets/templates/`: Customize sections and metrics
-- [ ] `references/domain-context.md`: Add your team's context
+- [x] `config.yaml`: All team-specific values
+- [x] `assets/templates/`: Customize sections and metrics
+- [x] `references/domain-context.md`: Add your team's context
 - [ ] Test: Say "Build CXI exec summary" and verify it triggers
 
----
-
 ## References
-- 📚 Team context & style guide: `references/domain-context.md`
-- 🔌 MCP tool usage guide: `references/mcp-integration.md`
-- 📝 More examples: `references/examples/`
+- Team context and style guide: `references/domain-context.md`
+- MCP tool usage guide: `references/mcp-integration.md`
+- More examples: `references/examples/`

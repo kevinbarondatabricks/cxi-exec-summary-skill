@@ -28,6 +28,14 @@ data_sources:
       - CXI
     days_back: 14  # How many days to look back for meetings
 
+  # Gmail - Gemini Meeting Summaries
+  gmail:
+    # Gemini auto-generates meeting summary emails after CXI calls
+    # These often land in Trash, so we use in:anywhere to search all folders
+    query: "in:anywhere from:me subject:(notes of CXI) newer_than:14d"
+    max_results: 20
+    days_back: 14  # Match the biweekly cycle
+
   # JIRA Configuration
   jira:
     project_key: PLAT  # CXI project

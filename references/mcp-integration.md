@@ -28,10 +28,10 @@ All data fetching and document creation happens through MCP tools - no custom sc
 
 **Example Usage:**
 ```python
-# Get meetings from last 7 days
+# Get meetings from last 14 days
 calendar_event_list(
-    time_min="2026-03-01T00:00:00Z",
-    time_max="2026-03-07T23:59:59Z",
+    time_min="2026-03-05T00:00:00Z",
+    time_max="2026-03-19T23:59:59Z",
     q="CXI Stand up OR CXI Sprint Planning",
     calendar_id="primary",
     max_results=50
@@ -43,6 +43,46 @@ calendar_event_list(
 - Description/notes from event
 - Action items (look for keywords like "TODO", "Action:", "Decision:")
 - Attendees for context
+
+---
+
+### Gmail - Gemini Meeting Summaries
+
+**Tool:** `mcp__google__google_read_api_call`
+
+Gemini generates meeting summary emails after CXI calls. These often end up in Trash, so always use `in:anywhere` to search all folders.
+
+**Example Usage:**
+```python
+# Search for Gemini meeting notes (includes Trash and Spam)
+google_read_api_call(
+    endpoint="gmail/messages",
+    params={
+        "q": "in:anywhere from:me subject:(notes of CXI) newer_than:14d",
+        "maxResults": 20
+    }
+)
+```
+
+**Gmail search query breakdown:**
+- `in:anywhere` - searches all folders including Trash and Spam (default excludes these)
+- `from:me` - Gemini summaries are sent from your own account
+- `subject:(notes of CXI)` - matches Gemini's subject format for CXI meeting notes
+- `newer_than:14d` - last 14 days to match the biweekly cycle
+
+**What to Extract:**
+- Key discussion points captured by Gemini
+- Action items and owners
+- Decisions made during the meeting
+- Cross-reference with Calendar events to fill gaps
+
+**Note:** After getting the message list, fetch individual message content using:
+```python
+google_read_api_call(
+    endpoint="gmail/messages/{message_id}",
+    params={"format": "full"}
+)
+```
 
 ---
 
@@ -621,9 +661,17 @@ slack_write_api_call(
 ```python
 # 1. Gather data from all sources
 calendar_events = calendar_event_list(
-    time_min="2026-03-01T00:00:00Z",
-    time_max="2026-03-07T23:59:59Z",
+    time_min="2026-03-05T00:00:00Z",
+    time_max="2026-03-19T23:59:59Z",
     q="CXI"
+)
+
+gemini_notes = google_read_api_call(
+    endpoint="gmail/messages",
+    params={
+        "q": "in:anywhere from:me subject:(notes of CXI) newer_than:14d",
+        "maxResults": 20
+    }
 )
 
 jira_tickets = jira_read_api_call(
