@@ -86,7 +86,7 @@ These rules override any conflicting guidance elsewhere:
 
 ### Stakeholder Communication Patterns
 
-**Sam Shah (VP Support) - PRIMARY AUDIENCE.** The exec summary should be written for Sam first. His communication patterns will be refined over time as we learn what he responds to and asks about. Until then, optimize for clarity, conciseness, and operational relevance to Support leadership.
+**Sam Shah (VP Support) - PRIMARY AUDIENCE for exec biweekly.** The exec biweekly should be written for Sam first. His communication patterns will be refined over time as we learn what he responds to and asks about. Until then, optimize for clarity, conciseness, and operational relevance to Support leadership.
 
 **Hatim (COO):** Action-oriented. Immediately asks for demos/recordings - wants to see the work. Responds with measurable targets ("let's set some targets on assignment and reassignment %"). Expects tight feedback loops and iteration. Asks probing questions about process and quality bar. Frame updates so they answer: "What can I see?" and "What are we measuring?"
 
@@ -152,7 +152,7 @@ What this unlocks:
 
 **Format:** Table + contributor callout
 
-**Note:** Aha! data cannot be scraped automatically. When generating the exec summary, always include this subsection header and table structure, populated with: `CONFIRM MANUALLY - review Aha! ideas portal and fill in before sending.` This signals the need for manual input before distribution.
+**Note:** Aha! data cannot be scraped automatically. When generating the exec biweekly, always include this subsection header and table structure, populated with: `CONFIRM MANUALLY - review Aha! ideas portal and fill in before sending.` This signals the need for manual input before distribution.
 
 **Example:**
 ```
@@ -262,6 +262,83 @@ metrics across DBSQL cases.
 | Isaac Investigation Surface | **On Track** | Support Agent workflow measurable end-to-end |
 | Support Tooling Backend Service | **Deferred** | Deprioritized to focus on DBSQL - revisit Q2 |
 ```
+
+## Weekly Support Update Writing Style Guidance
+
+### Audience
+**Directors, TSE Managers, Shift Leads, Tech Leads, TSEs.** These are practitioners and their managers. They care about what changed in their day-to-day workflow and how to use it. They do not need roadmap strategy, leadership asks, or metric baselines.
+
+### Core Principles
+- **Right message for the right audience:** Support leadership receives concise outcomes, trends, and asks (exec biweekly). Rest of Support receives what changes in workflows and how to try it (weekly support).
+- **Low lift for Support leadership:** The same core content is reused across comms for different audiences. Support leadership is not asked to build decks or ad-hoc reports.
+- **Consistent narrative:** Support hears a consistent story about automation without Support leaders needing to orchestrate it.
+
+### Overall Tone
+- Write like you are explaining to a colleague, not presenting to leadership
+- Be direct and practical - "here's what changed and how to use it"
+- Assume no prior context - a TSE reading this for the first time should understand what to do
+- Acknowledge limitations honestly - practitioners trust updates that don't oversell
+- Keep it short - the whole update should be readable in 2 minutes
+
+### Section: What's New
+**What to include:**
+- Only items with a practitioner-facing impact - skip internal architecture, refactors, or leadership strategy
+- Lead each item with the **tool or workflow name** in bold
+- One spaced paragraph per item
+- Describe what's different for the reader, not what CXI built
+
+**What to skip:**
+- Roadmap strategy or reprioritization decisions
+- Cross-functional asks (those belong in the exec biweekly)
+- Metric baselines or targets (practitioners don't need these)
+- Items still in development with no user-facing change yet
+
+**Example:**
+```
+**Merlin DBSQL Auto-Collection is live.** When a DBSQL case is created, Merlin now
+automatically collects workspace diagnostics (query plans, cluster config, error logs).
+You no longer need to manually request these from the customer.
+```
+
+### Section: How to Try It
+**What to include:**
+- One numbered list per tool/feature, with the **tool name bolded** as a sub-heading
+- 3-5 steps max - if it takes more, link to a detailed doc instead
+- Include direct links wherever possible (dashboards, tools, docs)
+- Write for someone who has never used this tool before
+
+**Example:**
+```
+**Merlin Auto-Collection:**
+1. Open any new DBSQL case in Salesforce
+2. Check the "Diagnostics" tab - Merlin-collected data appears automatically within 5 minutes
+3. If data is missing, click "Request Collection" to trigger manually
+```
+
+### Section: Known Limitations
+**What to include:**
+- What doesn't work yet, what to expect, workarounds
+- Bold the tool name, then state the limitation plainly
+- If there is a workaround, include it
+- If no limitations to report, say so
+
+**Example:**
+```
+**Merlin auto-collection** currently supports DBSQL workspaces only; other product areas
+are planned for Q2.
+```
+
+### Section: Questions / Feedback
+**What to include:**
+- Keep this section stable week to week
+- Always include: Slack channel, Aha! Ideas portal link, direct contact email
+- This is the same every week unless channels change
+
+### Data Filtering from Shared Sources
+The weekly support profile uses the same Phase 0 + Phase 1 data as the exec biweekly. When structuring content for this profile:
+- **Include:** Shipped features, new tool capabilities, workflow changes, bug fixes that affect TSE experience
+- **Exclude:** Roadmap status changes, leadership asks, metric targets, internal refactors, compliance/architecture decisions
+- **Reframe:** Where the exec biweekly says "Merlin v2 shipped; auto-collection live" (outcome), the weekly support says "Merlin now auto-collects diagnostics on DBSQL cases - here's how to use it" (action)
 
 ## Team-Specific Customizations
 

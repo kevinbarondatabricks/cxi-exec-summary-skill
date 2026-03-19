@@ -571,7 +571,7 @@ mcp__google__docs_document_batch_update(
 # Add comment to notify them
 mcp__google__drive_comment_create(
     file_id=document_id,
-    content="@sam.shah Please review this sprint's exec summary by EOD Friday"
+    content="@sam.shah Please review this sprint's exec biweekly by EOD Friday"
 )
 ```
 

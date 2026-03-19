@@ -1,19 +1,40 @@
-# ABAC Newsletter Skill Configuration
-# 👉 CUSTOMIZE ALL VALUES BELOW FOR YOUR TEAM
+# CXI Update Skill Configuration
+# Supports multiple audience profiles from the same core data sources
 
 # Basic Team Info
-team: CXI  # Your team name
-schedule: biweekly  # Options: weekly, biweekly, monthly
-timezone: America/Los_Angeles  # Your timezone
+team: CXI
+timezone: America/Los_Angeles
 
-# Reviewers
-# 👉 UPDATE with your actual reviewer emails
-reviewers:
-  primary: kevin.baron@databricks.com  # Primary reviewer (required)
-  secondary: samira.emmerson@databricks.com  # Secondary reviewer (optional)
-  cc:  # Optional: Additional people to CC
-    - nilesh.bhide@databricks.com
-    - manoj@databricks.com
+# Profiles - each profile targets a different audience with the same core data
+profiles:
+  exec_biweekly:
+    name: "Biweekly Executive Summary"
+    schedule: biweekly
+    audience: "VP Support, COO, SVP Eng"
+    template_id: "1_Wqcl7rmWHME4vGkKiCLs-3BXIdYE7gH7wbxuzW27ys"
+    markdown_template: "assets/templates/biweekly-template.md"
+    style_section: "Executive Summary Writing Style Guidance"
+    title_format: "CXI Executive Summary - {date}"
+    slack_notification_channel: "#support-automation"
+    reviewers:
+      primary: kevin.baron@databricks.com
+      secondary: samira.emmerson@databricks.com
+      cc:
+        - nilesh.bhide@databricks.com
+        - manoj@databricks.com
+
+  weekly_support:
+    name: "Weekly Support"
+    schedule: weekly
+    audience: "Directors, TSE Managers, Shift Leads, Tech Leads, TSEs"
+    # TODO: Create Google Doc template for weekly support and add template_id here
+    template_id: ""
+    markdown_template: "assets/templates/weekly-support-template.md"
+    style_section: "Weekly Support Update Writing Style Guidance"
+    title_format: "CXI Weekly Support Update - {date}"
+    slack_notification_channel: "#support-automation"
+    reviewers:
+      primary: kevin.baron@databricks.com
 
 # Data Sources Configuration
 data_sources:
@@ -56,7 +77,7 @@ data_sources:
     # Roadmap-to-JIRA Mapping
     # Each Epic on the Support Platform board represents a product area.
     # Each Roadmap Objective maps to one of these product areas.
-    # When building the exec summary, group JIRA tickets by their Epic,
+    # When building the exec biweekly, group JIRA tickets by their Epic,
     # then frame progress in terms of the corresponding Roadmap Objective.
     #
     # 👉 UPDATE this mapping when roadmap objectives or product areas change.
@@ -85,47 +106,19 @@ data_sources:
     days_back: 14  # How many days to look back
     min_reactions: 2  # Minimum reactions to include message
 
-# Output Configuration
+# Output Configuration (shared across profiles)
 output:
-  # 👉 CHOOSE: google_doc, email, or markdown
   format: google_doc  # Options: google_doc, email, markdown
 
-  # Google Drive Settings (if format = google_doc)
   google_drive:
-    # 👉 CHANGE TO YOUR TEAM'S NEWSLETTER FOLDER ID
-    # (Get this from the folder URL: drive.google.com/drive/folders/{FOLDER_ID})
+    # Shared folder for all CXI updates
     folder_id: "15N7jxMSBzLpqVb92TxxZbTneCQUm9-tD"
+    # Per-profile template_id is in the profiles section above
 
-    # 👉 CRITICAL: Create a formatted Google Doc template with:
-    #    - Purple table headers (#5B3A8F)
-    #    - Colored status indicators
-    #    - All sections/tables pre-formatted
-    #    - Placeholder text to be replaced
-    # Then paste the template doc ID here (from URL: docs.google.com/document/d/{TEMPLATE_ID})
-    template_id: "1_Wqcl7rmWHME4vGkKiCLs-3BXIdYE7gH7wbxuzW27ys"
-
-  # Email Settings (if format = email)
-  email:
-    subject_format: "{team} Executive Summary - {date}"  # Template for email subject
-    from_name: "CXI Team"  # Display name for sender
-
-  # Slack Notification Settings
   slack_notification:
-    enabled: true  # Set to false to disable Slack notifications
-    # 👉 CHANGE TO YOUR TEAM'S LEADERSHIP/ANNOUNCEMENT CHANNEL
-    channel: "#support-automation"
-    message_template: "📰 {team} Executive Summary draft ready for review: {link}"
-
-# Template Configuration
-# NOTE: These markdown templates are not used in the Google Doc workflow.
-# The Google Doc template (output.google_drive.template_id) is the actual template.
-# templates:
-#   weekly: "assets/templates/weekly-template.md"
-#   monthly: "assets/templates/monthly-template.md"
-
-  # Optional: Custom templates for specific audiences
-  # executive: "assets/templates/executive-template.md"
-  # engineering: "assets/templates/engineering-template.md"
+    enabled: true
+    # Per-profile channel is in the profiles section above
+    message_template: "{profile_name} draft ready for review: {link}"
 
 # Metrics Configuration
 # 👉 CUSTOMIZE which metrics to track and display

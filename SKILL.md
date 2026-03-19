@@ -1,28 +1,65 @@
 ---
-name: cxi-exec-summary
+name: cxi-update
 description: >
-  IMMEDIATELY activate when user says "build CXI exec summary", "create CXI biweekly update",
-  "generate exec summary for CXI", or mentions CXI executive updates. Automatically
-  aggregate context from Google Docs, JIRA tickets, meetings, and Slack without asking for
-  confirmation. This is a recurring workflow - be proactive.
+  IMMEDIATELY activate when user mentions CXI updates, summaries, or newsletters for any audience.
+  This skill has TWO profiles - always determine which one before proceeding:
+  (1) exec biweekly - triggered by "exec biweekly", "leadership update", or "exec summary"
+  (2) weekly support - triggered by "weekly support", "support team update", or "weekly summary"
+  If invoked via /cxi-exec-summary-skill or ambiguously, ASK the user which profile before proceeding.
+  Automatically aggregates context from Google Docs, JIRA, meetings, Gmail, and Slack.
 triggers:
-  - CXI Executive Summary
+  - CXI exec biweekly
+  - CXI leadership update
   - CXI exec summary
-  - CXI biweekly update
-version: 1.1.0
+  - CXI weekly support
+  - CXI support team update
+  - CXI weekly summary
+  - CXI update
+version: 1.2.0
 author: Kevin Baron-Quijano <kevin.baron@databricks.com>
 ---
 
-# CXI Executive Summary Builder
+# CXI Update Builder
 
 ## What This Skill Does
-Automatically generates executive-ready newsletter summaries by aggregating updates from:
+Generates audience-appropriate updates by aggregating from the same core sources and repackaging for different audiences. Same data, different lens.
+
+**Sources:**
 - Team Notes (from Google Suite via MCP)
 - JIRA tickets (via MCP JIRA connection)
 - Meeting notes (from Google Calendar via MCP)
+- Gemini meeting summaries (from Gmail via MCP)
 - Slack discussions (via MCP Slack connection)
 
+**Two profiles (see `config.yaml` for full configuration):**
+
+| | Exec Biweekly | Weekly Support |
+|---|---|---|
+| **Audience** | VP Support, COO, SVP Eng | Directors, TSE Managers, Shift Leads, Tech Leads, TSEs |
+| **Cadence** | Biweekly | Weekly |
+| **Lens** | Outcomes, trends, asks | What's new, how to try it, where to ask |
+| **Template** | `biweekly-template.md` | `weekly-support-template.md` |
+| **Trigger** | "build CXI exec biweekly" | "build CXI weekly support" |
+| **Alt triggers** | "leadership update", "exec summary" | "support team update", "weekly summary" |
+
 **Output:** Formatted Google Doc ready for review.
+
+## Profile Selection (MANDATORY - always resolve before Phase 0)
+
+**NEVER default to a profile. Always resolve explicitly.**
+
+| User says | Profile |
+|---|---|
+| "exec biweekly", "leadership update", "exec summary", "biweekly" | `exec_biweekly` |
+| "weekly support", "support team update", "weekly summary" | `weekly_support` |
+| `/cxi-exec-summary-skill` (bare invocation) | **ASK** |
+| "CXI update" (ambiguous) | **ASK** |
+| "build both" | Run both profiles sequentially |
+
+When asking, use:
+> Which CXI update do you want to build?
+> 1. **Exec Biweekly** - for leadership (Sam, Hatim, Vinod)
+> 2. **Weekly Support** - for Directors, TSE Managers, Shift Leads, Tech Leads, TSEs
 
 > **CRITICAL: No hallucination policy.** If information for any section cannot be verified from the sources searched (JIRA, Slack, Google Docs, Calendar), do NOT fabricate or infer content. Instead, include the section header with: `CONFIRM MANUALLY - data not found in sources.` Always err on the side of leaving a section for manual review rather than generating unverified content. This applies to every section, including Roadmap status, Impact Signal metrics, What's Next items, and Ideas around Innovation from Support.
 
@@ -40,9 +77,10 @@ These rules apply to ALL generated content in the Google Doc:
 8. **Paragraph spacing:** Add blank lines between paragraphs in What Shipped and Highlights sections for visual breathing room
 
 ## When to Use
-- User requests CXI Executive Summary
-- Time for recurring newsletter (check `config.yaml` for schedule)
-- Ad-hoc executive summary needed
+- User requests CXI exec biweekly (for leadership)
+- User requests CXI weekly support (for broader Support org)
+- Time for recurring update (check `config.yaml` profiles for schedules)
+- Ad-hoc summary needed for either audience
 
 ## Workflow
 
@@ -89,31 +127,37 @@ These rules apply to ALL generated content in the Google Doc:
 **Output:** Aggregated data structured by source
 
 ### Phase 2: Content Structuring
-**Goal:** Transform raw data into narrative format
+**Goal:** Transform raw data into narrative format appropriate for the selected profile
 
-1. **Apply Template**
-   - Use: `assets/templates/biweekly-template.md`
-   - Sections: TL;DR, What Shipped, What this unlocks, Impact Signal, Risks / Gaps, Asks, Highlights, What's Next, Roadmap
-   - See `references/domain-context.md` for writing style guidance per section
+**Select template and style based on profile:**
 
-2. **Follow Best Practices**
-   - See: `references/domain-context.md#writing-style`
-   - Exec-friendly: Focus on impact, not implementation details
-   - Quantify results where possible
+#### If profile = exec biweekly:
+1. **Apply Template:** `assets/templates/biweekly-template.md`
+2. **Sections:** TL;DR, What Shipped, What this unlocks, Impact Signal, Risks / Gaps, Asks, Highlights, What's Next, Roadmap
+3. **Style:** See `references/domain-context.md` - "Executive Summary Writing Style Guidance"
+4. **Lens:** Outcomes, trends, strategic progress, cross-functional asks
 
-3. **Follow Output Formatting Rules** (see above)
-   - No emojis anywhere
-   - No em dashes; use regular dashes and semicolons
-   - Bold key points throughout
-   - All headers: Heading 2, Arial, 16px, Bold
-   - No dividers between sections
+#### If profile = weekly support:
+1. **Apply Template:** `assets/templates/weekly-support-template.md`
+2. **Sections:** What's New, How to Try It, Known Limitations, Questions / Feedback
+3. **Style:** See `references/domain-context.md` - "Weekly Support Update Writing Style Guidance"
+4. **Lens:** What changed in workflows, how to use it, where to ask questions
+5. **Data filtering:** From the same Phase 1 data, extract only items that have a practitioner-facing impact - skip internal architecture changes, roadmap strategy, or leadership asks
 
-4. **Format for Medium**
-   - **Google Doc (RECOMMENDED):** Use template-based approach
-     1. Copy pre-formatted template: `mcp__google__drive_file_copy`
-     2. Replace content: `mcp__google__docs_document_batch_update` with `replaceAllText` requests
-     3. IMPORTANT: Use plain text only - NO HTML tags (they render as literal text)
-   - **Email:** Use `mcp__google__gmail_message_send`
+**Shared best practices (both profiles):**
+- Follow Output Formatting Rules (see above)
+- No emojis anywhere
+- No em dashes; use regular dashes and semicolons
+- Bold key points throughout
+- All headers: Heading 2, Arial, 16px, Bold
+- No dividers between sections
+
+**Format for Medium:**
+- **Google Doc (RECOMMENDED):** Use template-based approach
+  1. Copy pre-formatted template: `mcp__google__drive_file_copy` (use `template_id` from the active profile in config.yaml)
+  2. Replace content: `mcp__google__docs_document_batch_update` with `replaceAllText` requests
+  3. IMPORTANT: Use plain text only - NO HTML tags (they render as literal text)
+- **Email:** Use `mcp__google__gmail_message_send`
 
 **Output:** Structured draft with all sections populated
 
@@ -121,7 +165,7 @@ These rules apply to ALL generated content in the Google Doc:
 **Goal:** Finalize and distribute
 
 1. **Generate Draft Using Template**
-   - Copy template: `mcp__google__drive_file_copy` with `template_id` from config.yaml
+   - Copy template: `mcp__google__drive_file_copy` with `template_id` from the active profile in config.yaml
    - Update title: Use `replaceAllText` to set date/week
    - Replace content sections: Use multiple `replaceAllText` requests (NO HTML tags!)
    - All formatting (headers, tables, etc.) is preserved from template
@@ -144,9 +188,11 @@ These rules apply to ALL generated content in the Google Doc:
 
 ## Success Criteria
 
-### Example Input
+### Profile: exec biweekly
+
+#### Example Input
 ```
-User: "Build the CXI exec summary"
+User: "Build the CXI exec biweekly"
 ```
 
 ### Expected Output
@@ -223,6 +269,60 @@ No material blockers. Key dependencies:
 | Support Tooling Backend Service | **Deferred** | Deprioritized for Q1; revisit Q2 |
 ```
 
+### Profile: weekly support
+
+#### Example Input
+```
+User: "Build the CXI weekly support"
+```
+
+#### Expected Output
+1. Google Doc created with title "CXI Weekly Support Update - [date]"
+2. Contains:
+   - What's New - practitioner-facing changes from this week; what's different in their workflow
+   - How to Try It - simple step-by-step instructions with links; a TSE should be able to follow this without prior context
+   - Known Limitations - what doesn't work yet, what to expect, workarounds
+   - Questions / Feedback - where to ask questions and how to give feedback
+3. Same formatting rules as exec biweekly (no emojis, no em dashes, bold key points, Heading 2 headers)
+4. Reviewers tagged and notified
+5. Link shared in Slack
+
+#### Sample Generated Content
+```markdown
+# CXI Weekly Support Update - March 19, 2026
+
+## What's New
+
+**Merlin DBSQL Auto-Collection is live.** When a DBSQL case is created, Merlin now automatically collects workspace diagnostics (query plans, cluster config, error logs). You no longer need to manually request these from the customer.
+
+**Support Agent evaluation UI is available for DBSQL TSEs.** You can now review and rate AI-generated suggestions (Next Best Action, case summary, similar cases) directly in the agent interface.
+
+## How to Try It
+
+**Merlin Auto-Collection:**
+1. Open any new DBSQL case in Salesforce
+2. Check the "Diagnostics" tab - Merlin-collected data appears automatically within 5 minutes of case creation
+3. If data is missing, click "Request Collection" to trigger manually
+
+**Support Agent Evaluation UI:**
+1. Go to [Support Agent link]
+2. Open a DBSQL case
+3. Review the AI-generated suggestions in the right panel
+4. Use the thumbs up/down buttons to rate each suggestion - this directly improves the model
+
+## Known Limitations
+
+- **Merlin auto-collection** currently supports DBSQL workspaces only; other product areas are planned for Q2
+- **Support Agent suggestions** may be slow on cases with 50+ comments; optimization is in progress
+- **Evaluation UI** does not yet save ratings offline - you need to be connected
+
+## Questions / Feedback
+
+- Slack: **#support-automation** - ask anything, share feedback, report issues
+- For feature requests: [Aha! Ideas Portal](https://databrickinternal.ideas.aha.io/ideas?category=7603850531562979200)
+- Direct feedback to the CXI team: kevin.baron@databricks.com
+```
+
 ## Configuration
 
 ### Required MCP Connections
@@ -240,38 +340,28 @@ Ensure these MCP servers are configured in your Claude Code settings:
 ```
 
 ### Skill Configuration
-**EDIT `config.yaml` with your team's details:**
+**See `config.yaml` for full configuration.** Key structure:
 
 ```yaml
-team: CXI
-schedule: biweekly
+# Two audience profiles sharing the same data sources
+profiles:
+  exec_biweekly:
+    schedule: biweekly
+    audience: "VP Support, COO, SVP Eng"
+    template_id: "..."  # Google Doc template for exec biweekly
+    markdown_template: "assets/templates/biweekly-template.md"
+  weekly_support:
+    schedule: weekly
+    audience: "Directors, TSE Managers, Shift Leads, Tech Leads, TSEs"
+    template_id: "..."  # Google Doc template for weekly support
+    markdown_template: "assets/templates/weekly-support-template.md"
 
-reviewers:
-  primary: kevin.baron@databricks.com
-  secondary: samira.emmerson@databricks.com
-
+# Shared data sources (used by both profiles)
 data_sources:
-  meetings:
-    calendar_id: "kevin.baron@databricks.com"
-    keywords:
-      - "CXI Stand up"
-      - "CXI Sprint Planning"
-      - "CXI Sprint Review"
-      - CXI
-  jira:
-    project_key: PLAT
-    custom_jql: "project = PLAT AND component = 'Support Platform' AND (status = 'In Progress' OR updated >= -14d) ORDER BY priority DESC"
-  slack:
-    channels:
-      - support-automation
-      - support-agent-internal
-      - eng-support-automation
-      - allhands-support
-
-output:
-  format: google_doc
-  google_drive_folder_id: "15N7jxMSBzLpqVb92TxxZbTneCQUm9-tD"
-  slack_notification_channel: "#support-automation"
+  meetings: ...
+  gmail: ...
+  jira: ...
+  slack: ...
 ```
 
 ## Troubleshooting
@@ -302,10 +392,13 @@ See `references/mcp-integration.md#troubleshooting` for detailed solutions.
 Before using this skill, update:
 
 - [x] YAML frontmatter: `name`, `description`, `triggers`, `author`
-- [x] `config.yaml`: All team-specific values
-- [x] `assets/templates/`: Customize sections and metrics
-- [x] `references/domain-context.md`: Add your team's context
-- [ ] Test: Say "Build CXI exec summary" and verify it triggers
+- [x] `config.yaml`: Profiles, data sources, team-specific values
+- [x] `assets/templates/biweekly-template.md`: Exec biweekly template
+- [x] `assets/templates/weekly-support-template.md`: Weekly support template
+- [x] `references/domain-context.md`: Style guidance for both profiles
+- [ ] Create Google Doc template for weekly support and add `template_id` to config.yaml
+- [ ] Test: Say "Build CXI exec biweekly" and verify exec biweekly profile triggers
+- [ ] Test: Say "Build CXI weekly support" and verify weekly support profile triggers
 
 ## References
 - Team context and style guide: `references/domain-context.md`
