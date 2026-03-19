@@ -8,9 +8,40 @@
 **Team Size:** 5 engineers, 3 product specialists, 1 TPM
 
 **Stakeholders:**
-- Chief Operating Officer: hatim@databricks.com
-- SVP Engineering: vinod.marur@databricks.com
-- VP Support: sam.shah@databricks.com
+These emails can be used for the To:/CC: lines when distributing updates via `mcp__google__gmail_message_send`.
+
+### Exec Biweekly Distribution
+
+**To:**
+| Name | Role | Email |
+|------|------|-------|
+| Hatim Shafique | Chief Operating Officer | hatim@databricks.com |
+| Vinod Marur | SVP, Engineering | vinod.marur@databricks.com |
+| Sam Shah | VP, Engineering, Data | sam.shah@databricks.com |
+
+**CC:**
+| Name | Role | Email |
+|------|------|-------|
+| Samira Emmerson | Director, Backline Engineering | samira.emmerson@databricks.com |
+| Manoj Koushik | Director, Support Automation | manoj.koushik@databricks.com |
+| Abizer Adenwala | Director, Backline Engineering | abizer.adenwala@databricks.com |
+| Ram Prasad | Sr. Manager, Backline Engineering | ram.prasad@databricks.com |
+| Jacob Plachta | Staff Software Engineer | jacob.plachta@databricks.com |
+| Huy Nguyen | Software Engineer | huy.nguyen@databricks.com |
+| Sayan Sanyal | Staff Data Scientist | sayan.sanyal@databricks.com |
+| Olarn Pornpitaksuk | Sr. Data Scientist | olarn.p@databricks.com |
+| Devyn Fisher | Sr. Data Scientist | devyn.fisher@databricks.com |
+| Max Ramsay | Staff Product Specialist | max.ramsay@databricks.com |
+| Scott Oseychik | Sr. Staff Supportability Product Specialist | scott.oseychik@databricks.com |
+| Nilesh Bhide | Director, Technical Program Management | nilesh.bhide@databricks.com |
+| Farhad Pagdiwalla | VP, Product Operations | farhad.pagdiwalla@databricks.com |
+
+### Weekly Support Distribution
+
+**To:**
+| Name | Email |
+|------|-------|
+| Extended Support Leadership | extended-support-leadership@databricks.com |
 
 ## Key Metrics to Track
 
@@ -357,19 +388,18 @@ The weekly support profile uses the same Phase 0 + Phase 1 data as the exec biwe
 - Prioritize message content and relevance over reactions
 - Emoji reactions are a supplementary signal only
 
-## Template Customization Examples
+## Profile Tone Summary
 
-### For Executive Audience
-- Focus on business impact and customer value
-- Minimize technical jargon
-- Lead with numbers and outcomes
+### Exec Biweekly (Leadership)
+- **Audience:** Hatim, Vinod, Sam (To:); Directors, TPM, IC leads (CC:)
+- Focus on business impact, outcomes, and trends
+- Minimize technical jargon; lead with numbers and what they mean
+- Include roadmap status, metric baselines, and cross-functional asks
+- Frame risks as dependencies with owners and next steps
 
-### For Engineering Leadership
-- Include technical details in "deep dive" section
-- Show velocity trends and sprint health
-- Highlight technical debt or architecture decisions
-
-### For Cross-Functional Teams
-- Balance technical and business language
-- Highlight dependencies and collaboration points
-- Include "How to Help" section if needed
+### Weekly Support (Practitioners)
+- **Audience:** Extended Support Leadership DL (Directors, TSE Managers, Shift Leads, Tech Leads, TSEs)
+- Focus on what changed in workflows and how to use it
+- Write like a teammate explaining a new tool; assume no prior context
+- Include step-by-step instructions with links
+- Acknowledge limitations honestly; skip roadmap strategy and leadership asks
