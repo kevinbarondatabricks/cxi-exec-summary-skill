@@ -1,20 +1,18 @@
 # {TEAM_NAME} | Biweekly Executive Summary | {DATE}
 
-<!-- TODO: This template's sections need to be updated to match the domain-context.md structure:
-  Q1 Goal → Progress Narrative → What this unlocks → Risks/Gaps → Metrics → Highlights
-  See references/domain-context.md#executive-summary-writing-style-guidance for details.
--->
-
 <!-- 👉 PLACEHOLDERS TO REPLACE:
-  {TEAM_NAME} - Your team name (e.g., "ABAC + Permission Model")
-  {DATE} - Current date (e.g., "March 7, 2026")
-  {GO_LINK} - Your team's go link (e.g., "go/abac-update")
-  {FAQ_LINK} - FAQ link (e.g., "go/abac-faqs")
+  {TEAM_NAME} - Your team name (e.g., "CXI")
+  {DATE} - Current date (e.g., "March 19, 2026")
+  {GO_LINK} - Your team's go link (e.g., "go/cxi")
+  {FAQ_LINK} - FAQ link (e.g., "go/cxi")
   {TEAM_DESCRIPTION} - One-sentence description of what your team does
-  {HIGHLIGHTS} - 3-5 bullet points of key accomplishments
-  {METRICS} - Your team's KPIs (e.g., velocity, uptime, customers)
-  {BLOCKERS} - Current blockers (or "No blockers this sprint")
-  {NEXT_WEEK} - Upcoming milestones and focus areas
+  {Q1_GOAL} - One sentence: the quarterly goal this work ladders to
+  {WHAT_SHIPPED} - Narrative paragraph on what moved this sprint
+  {WHAT_THIS_UNLOCKS} - Bullet list of impact framing
+  {IMPACT_SIGNAL} - Metrics with baselines and targets, usability/eval data
+  {RISKS_GAPS_ASKS} - Dependencies, constraints, and cross-functional requests
+  {HIGHLIGHTS} - Demos, deliverables, recordings/links
+  {WHATS_NEXT} - Concrete next-sprint items with dates
   {SLACK_CHANNEL} - Your team's Slack channel for questions
 -->
 
@@ -26,136 +24,125 @@
 
 ---
 
-## Upcoming Launches
+## 🎯 Q1 Goal
 
-<!-- 👉 CUSTOMIZE THIS TABLE with your launches/milestones -->
+{Q1_GOAL}
 
-| Launch Stage | Status | Launch Date |
-|-------------|--------|-------------|
-| {LAUNCH_1_NAME} | {STATUS_1} | {LAUNCH_1_DATE} |
-| {LAUNCH_2_NAME} | {STATUS_2} | {LAUNCH_2_DATE} |
-| {LAUNCH_3_NAME} | {STATUS_3} | {LAUNCH_3_DATE} |
-
-<!-- Status options: 🟢 On Track, 🟠 At Risk, 🔴 Blocked -->
+<!-- Keep this stable sprint-to-sprint — this is the anchor for the whole summary -->
 
 ---
 
-## ⭐ Executive Summary
+## TL;DR
 
-<!-- 👉 REPLACE with 3-5 key updates -->
+{TLDR_STATUS}
+
+<!-- One status indicator + one sentence.
+     🟢 On Track / 🟡 Needs Attention / 🔴 Off Track
+     Derive from Roadmap table + Risks/Gaps/Asks state. -->
+
+---
+
+## What Shipped
+
+{WHAT_SHIPPED}
+
+**What this unlocks:**
+{WHAT_THIS_UNLOCKS}
+
+<!-- Narrative paragraph on what moved this sprint, tied to the Q1 goal.
+     Follow with bullet list of what it enables — impact framing, not feature listing. -->
+
+### Ideas around Innovation from Support
+
+<!-- Source: https://databrickinternal.ideas.aha.io/ideas?category=7603850531562979200 -->
+
+| Idea | Submitted By | Outcome |
+|------|-------------|---------|
+| {IDEA_1} | {IDEA_1_SUBMITTED_BY} | {IDEA_1_OUTCOME} |
+| {IDEA_2} | {IDEA_2_SUBMITTED_BY} | {IDEA_2_OUTCOME} |
+| {IDEA_3} | {IDEA_3_SUBMITTED_BY} | {IDEA_3_OUTCOME} |
+
+<!-- Outcome format:
+     ✅ Shipped — brief description
+     🔜 Prioritized for next sprint
+     ⏸️ Not now — reason; revisit in next quarterly prioritization cycle
+-->
+
+**Spotlight contributors:** {SPOTLIGHT_CONTRIBUTORS}
+
+<!-- Call out teams/individuals whose input changed the design.
+     If no Aha! data is available, keep this subsection header and note:
+     "⚠️ TODO: Review Aha! ideas portal and fill in before sending." -->
+
+---
+
+## 📊 Impact Signal
+
+{IMPACT_SIGNAL}
+
+<!-- Metrics with baselines and targets (e.g., "5% improvement in TTM, baseline is 5.1 days").
+     Include usability/eval data when available (AI SAT scores, eval pass rates).
+     Acknowledge when it's too early to measure — state the goal instead. -->
+
+---
+
+## ⚠ Risks / Gaps / Asks
+
+{RISKS_GAPS_ASKS}
+
+<!-- Frame as "no material blockers" or "key dependencies" — not alarmist.
+     List specific team/system dependencies with names.
+     Surface explicit asks from Support/Eng/IT with who, what, and when.
+     Each item should have a clear owner or next step.
+     Limit: 0-3 items.
+
+     Example:
+     No material blockers. Key dependencies:
+     - IT / BSE for Salesforce write integration
+
+     Asks:
+     - Ask (IT): Prioritize Salesforce write access by April 1 for Phase 2 rollout
+-->
+
+---
+
+## ⭐ Highlights
 
 {HIGHLIGHTS}
 
-<!--
-Example format:
-### Feature X Launch
-- Delivered on time with zero P0 bugs
-- Onboarded 3 enterprise customers
-
-### Performance Improvements
-- Reduced latency by 40% (200ms → 120ms p95)
-- Achieved 99.95% uptime this week
--->
+<!-- Upcoming demos with dates, deliverable names in plain language,
+     links to recordings/docs/dashboards. Short paragraphs with bold deliverable names. -->
 
 ---
 
-## 📊 This Sprint's Metrics | [Dashboard Link]({DASHBOARD_LINK})
+## 📅 What's Next
 
-<!-- 👉 CUSTOMIZE with your KPIs -->
+{WHATS_NEXT}
 
-- **Sprint Points Completed:** {SPRINT_POINTS}
-- **Features Shipped:** {FEATURES_SHIPPED}
-- **Bugs Closed:** {BUGS_CLOSED}
-- **System Uptime:** {UPTIME}%
-- **Active Users:** {ACTIVE_USERS}
-- **Support Tickets:** {SUPPORT_TICKETS}
-
-<!-- 👉 ADD/REMOVE metrics based on what your stakeholders care about -->
+<!-- Concrete items planned for next sprint, tied to roadmap objectives.
+     Include dates or milestones where available.
+     If no data is available, keep this section header and note:
+     "⚠️ TODO: Fill in before sending." -->
 
 ---
 
-## ⚠ Risks/Blockers
+## 🗺️ Roadmap
 
-<!-- 👉 If NO blockers, replace table with: "No blockers this sprint ✅" -->
+| Roadmap Objective | Status | Progress |
+|-------------------|--------|----------|
+| {ROADMAP_1_OBJECTIVE} | {ROADMAP_1_STATUS} | {ROADMAP_1_PROGRESS} |
+| {ROADMAP_2_OBJECTIVE} | {ROADMAP_2_STATUS} | {ROADMAP_2_PROGRESS} |
+| {ROADMAP_3_OBJECTIVE} | {ROADMAP_3_STATUS} | {ROADMAP_3_PROGRESS} |
+| {ROADMAP_4_OBJECTIVE} | {ROADMAP_4_STATUS} | {ROADMAP_4_PROGRESS} |
 
-| Issue | Impacting Milestone | Mitigation/Next Steps | Owner | Notes |
-|-------|--------------------|-----------------------|-------|-------|
-| {BLOCKER_1_ISSUE} | {BLOCKER_1_MILESTONE} | {BLOCKER_1_MITIGATION} | {BLOCKER_1_OWNER} | {BLOCKER_1_NOTES} |
-| {BLOCKER_2_ISSUE} | {BLOCKER_2_MILESTONE} | {BLOCKER_2_MITIGATION} | {BLOCKER_2_OWNER} | {BLOCKER_2_NOTES} |
-
-<!-- Format: Each blocker MUST have owner and mitigation plan -->
-
----
-
-## 📅 Next Sprint's Focus
-
-<!-- 👉 REPLACE with upcoming milestones -->
-
-{NEXT_WEEK}
-
-<!--
-Example format:
-- Launch feature X (Monday)
-- Sprint planning session (Wednesday)
-- Customer demo with Acme Corp (Friday)
-- Bug bash for upcoming release
--->
+<!-- Derive from Quarterly Pre-Read + JIRA epic state (via roadmap_to_epic_mapping in config.yaml).
+     Status: 🟢 On Track | 🟡 At Risk | 🔴 Blocked | ⏸️ Deferred (include reason)
+     Progress: 1 sentence on what moved this sprint for that objective.
+     If an objective has no JIRA activity, flag it. -->
 
 ---
 
 **Questions?** Reach out in [{SLACK_CHANNEL}](https://company.slack.com/archives/CHANNEL_ID) or reply to this thread.
-
----
-
-## 📝 Template Usage Instructions
-
-### Step 1: Copy this template
-When generating a newsletter, copy this entire template as the starting point.
-
-### Step 2: Replace ALL placeholders
-Search for `{` and replace every `{PLACEHOLDER}` with actual data from:
-- Google Calendar (for highlights and next week)
-- JIRA (for metrics and launches)
-- Slack (for team updates)
-
-### Step 3: Remove unused sections
-- If no launches, delete "Upcoming Launches" table
-- If no blockers, replace table with "No blockers this sprint ✅"
-- If certain metrics don't apply, remove those rows
-
-### Step 4: Format for output
-- **For Google Docs:** Use `mcp__google__docs_document_create_from_markdown`
-- **For email:** Use `mcp__google__gmail_message_send` with body as HTML
-- **For Slack:** Post summary with link to full doc
-
-### Step 5: Add rich formatting (optional)
-For the exact PDF-style formatting (purple table headers, colored status, etc.):
-1. Create a template Google Doc with your desired formatting once
-2. Save the template ID in `config.yaml`
-3. Use `drive_file_copy` to duplicate the template
-4. Use `docs_document_batch_update` with `find_replace` to update placeholders
-
-See `references/mcp-integration.md#template-based-approach` for details.
-
----
-
-## Color Coding Guide (for rich formatting)
-
-**Status Indicators:**
-- 🟢 **On Track** - Green (#00CC00) - Everything going as planned
-- 🟠 **At Risk** - Orange (#FF9900) - May slip without intervention
-- 🔴 **Blocked** - Red (#FF0000) - Critical blocker preventing progress
-
-**Table Headers:**
-- Background: Purple (#5B3A8F)
-- Text: White (#FFFFFF)
-- Font: Bold
-
-**Section Icons:**
-- ⭐ Executive Summary (Yellow)
-- 📊 Metrics (Blue)
-- ⚠ Risks/Blockers (Orange/Red)
-- 📅 Next Week (Green)
 
 ---
 
@@ -164,9 +151,10 @@ See `references/mcp-integration.md#template-based-approach` for details.
 Before sending, verify:
 - [ ] All `{PLACEHOLDERS}` replaced with actual data
 - [ ] No "TBD" or empty values
-- [ ] Each blocker has owner + mitigation
+- [ ] Q1 Goal matches current quarterly objective
+- [ ] What Shipped is tied to Q1 Goal, not a generic feature list
+- [ ] Each risk/ask has owner + next step
+- [ ] Impact Signal includes baselines where available
+- [ ] What's Next has concrete items (not vague goals)
 - [ ] Links work (go links, dashboards, Slack channels)
-- [ ] Metrics are up-to-date (from this sprint, not last sprint)
-- [ ] Next sprint section has concrete items (not vague goals)
 - [ ] Reviewed by primary stakeholder
-- [ ] Spell check passed

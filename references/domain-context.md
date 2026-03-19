@@ -59,6 +59,7 @@
 - Be specific: "Launched feature X for 3 enterprise customers" not "Made progress on feature"
 
 ### ❌ DON'T
+- **Hallucinate or infer content not found in sources** — if data is unavailable, leave the section header with `⚠️ CONFIRM MANUALLY — data not found in sources.` Never fabricate metrics, status updates, or progress claims
 - Use jargon without context: "Refactored the ORM layer" → "Improved database performance"
 - Bury the lede: Get to the point in the first sentence
 - Overload with details: Execs want summary, not implementation details
@@ -121,6 +122,25 @@
 
 ---
 
+### Section: TL;DR
+**What to include:**
+- Immediately after Q1 Goal — this is the 5-second read for leadership
+- One status indicator: 🟢 On Track / 🟡 Needs Attention / 🔴 Off Track
+- One sentence explaining why — tie to the biggest signal (roadmap progress, a key blocker, or a pending ask)
+- Derive from the aggregate state of the Roadmap table and Risks/Gaps/Asks: if any roadmap item is 🔴 or there's an unresolved ask blocking progress, status should reflect that
+
+**Format:** Status emoji + one sentence
+
+**Example:**
+```
+🟢 On Track — All roadmap items progressing; one ask pending from IT (Salesforce write access) but not blocking current sprint.
+```
+```
+🟡 Needs Attention — Governed Execution Plane blocked on auth token exchange; ask to Eng submitted, awaiting response.
+```
+
+---
+
 ### Section: Progress Narrative
 **What to include:**
 - 1-2 paragraphs on what moved this sprint, tied to the Q1 goal
@@ -142,14 +162,43 @@ What this unlocks:
 - An initial way to assess which Sherpa outputs are useful enough to scale
 ```
 
+#### Subsection: From the Field (Aha! Ideas)
+**Source:** [Support Aha! Ideas Portal](https://databrickinternal.ideas.aha.io/ideas?category=7603850531562979200)
+
+**What to include:**
+- A small table connecting Support IC requests to outcomes — show the feedback loop is real
+- Structure each row as: what Support asked for → what CXI shipped or decided
+- For items not prioritized, include the reason and note it will be revisited in the next quarterly prioritization cycle
+- **Spotlight contributors:** Call out teams or individuals whose input changed the design
+
+**Format:** Table + contributor callout
+
+**Note:** Aha! data cannot be scraped automatically. When generating the exec summary, always include this subsection header and table structure, populated with: `⚠️ TODO: Review Aha! ideas portal and fill in before sending.` This signals the need for manual input before distribution.
+
+**Example:**
+```
+Ideas around Innovation from Support
+
+| Idea | Submitted By | Outcome |
+|------|-------------|---------|
+| Auto-collect DBSQL query plans on case creation | @jane-doe (FL DBSQL) | ✅ Shipped in Merlin v2 — now triggers on DBSQL case attach |
+| Slack integration for case escalation alerts | @platform-team | 🔜 Prioritized for next sprint |
+| Custom diagnostic templates per product area | @john-smith (BL) | ⏸️ Not now — scope too broad for Q1; revisit in Q2 prioritization |
+
+Spotlight: @jane-doe (FL DBSQL) flagged the query plan gap that shaped
+Merlin's auto-collection logic. @platform-team's input on auth flow
+changed how we scoped the Salesforce integration.
+```
+
 ---
 
-### Section: Risks / Gaps
+### Section: Risks / Gaps / Asks
 **What to include:**
 - Frame as "no material blockers" or "key dependencies" — not alarmist
 - List specific team/system dependencies with names
 - Note compliance or architectural constraints matter-of-factly
 - Each risk should have a clear owner or next step
+- Surface explicit **asks** — things CXI needs from cross-functional partners (Support, Eng, IT) to unblock or accelerate work. Frame as actionable requests with a who, what, and when
 
 **Limit:** 0-3 items
 
@@ -158,17 +207,23 @@ What this unlocks:
 There are no material blockers at this stage. Key dependencies:
 - IT / BSE for Salesforce write integration
 - SDR for Salesforce auth token exchange
+
+Asks:
+- Ask (IT): Prioritize Salesforce write access by April 1 for Phase 2 rollout
+- Ask (Eng): Allocate review bandwidth for MCP integration PR by end of sprint
 ```
 
 ---
 
-### Section: Metrics
+### Section: Impact Signal
 **What to include:**
 - Explicit targets with baselines (e.g., "5% improvement in TTM, baseline is 5.1 days")
 - Acknowledge when it's too early to measure — that's fine, but state the goal
 - Include operational metrics Hatim cares about (assignment %, reassignment %, SLA adherence)
 
 **Format:** Bullet points with numbers and baselines
+
+> **Note:** Keep this section's content guidance minimal until the "Key Metrics to Track" section (above) is updated with the metrics CXI is actively tracking. Once that section is populated, expand this guidance to reference those specific metrics, usability/eval data (e.g., AI SAT scores, eval pass rates), and metric movement trends.
 
 ---
 
@@ -187,6 +242,39 @@ evaluation of NBA, case summarization, similar cases and AI-SAT.
 
 Merlin DBSQL Auto-Collection: The first version of DBSQL diagnostic collection
 is now live from minimal customer input.
+```
+
+---
+
+### Section: Roadmap
+**What to include:**
+- A table with one row per roadmap objective from the Quarterly Pre-Read
+- **Status** and **Progress** columns must be updated each cycle based on JIRA epic state (use `roadmap_to_epic_mapping` in config.yaml to connect objectives to epics)
+- This keeps expectation management visible — stakeholders can see what's moving, what's blocked, and what was deprioritized
+- Makes prioritization criteria explicit: if something was cut or deferred, say why
+
+**Columns:** Roadmap Objective | Status | Progress
+
+**Status values:**
+- 🟢 On Track — progressing as planned
+- 🟡 At Risk — may slip without intervention
+- 🔴 Blocked — cannot proceed
+- ⏸️ Deferred — deprioritized this quarter (include reason)
+
+**How to derive Status and Progress:**
+- Pull JIRA tickets grouped by epic (via `roadmap_to_epic_mapping`)
+- Status = worst-case across tickets in the epic (any blocker → 🔴, any at-risk → 🟡, else 🟢)
+- Progress = summary of what moved this sprint for that objective (1 sentence)
+- If an objective has no JIRA activity, flag it — either it's deferred or the mapping needs updating
+
+**Example:**
+```
+| Roadmap Objective | Status | Progress |
+|-------------------|--------|----------|
+| Automatic Diagnostic Collection (DBSQL) | 🟢 On Track | Merlin v2 shipped; auto-collection live for DBSQL workspaces |
+| Governed Execution Plane | 🟡 At Risk | MCP integration PR in review; blocked on auth token exchange |
+| Isaac Investigation Surface | 🟢 On Track | Support Agent workflow measurable end-to-end |
+| Support Tooling Backend Service | ⏸️ Deferred | Deprioritized to focus on DBSQL — revisit Q2 |
 ```
 
 ---

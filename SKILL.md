@@ -27,6 +27,8 @@ Automatically generates executive-ready newsletter summaries by aggregating upda
 
 **Output:** Formatted Google Doc or email draft ready for review.
 
+> **⚠️ CRITICAL: No hallucination policy.** If information for any section cannot be verified from the sources searched (JIRA, Slack, Google Docs, Calendar), do NOT fabricate or infer content. Instead, include the section header with: `⚠️ CONFIRM MANUALLY — data not found in sources.` Always err on the side of leaving a section for manual review rather than generating unverified content. This applies to every section, including Roadmap status, Impact Signal metrics, What's Next items, and Ideas around Innovation from Support.
+
 ---
 
 ## When to Use
@@ -99,7 +101,7 @@ Automatically generates executive-ready newsletter summaries by aggregating upda
 
 1. **Apply Template**
    - Use: `assets/templates/biweekly-template.md`
-   - Sections: Q1 Goal, Progress Narrative, What this unlocks, Risks/Gaps, Metrics, Highlights
+   - Sections: Q1 Goal, TL;DR, Progress Narrative, What this unlocks, Risks/Gaps/Asks, Impact Signal, Highlights, What's Next, Roadmap
    - See `references/domain-context.md` for writing style guidance per section
 
    ```
@@ -186,11 +188,14 @@ User: "Build the CXI exec summary"
 1. ✅ Google Doc created with title "CXI Executive Summary - [date range]"
 2. ✅ Contains:
    - Q1 Goal — one sentence anchoring the quarterly objective
+   - TL;DR — 🟢/🟡/🔴 status + one sentence; derived from Roadmap and Risks/Gaps/Asks state
    - Progress Narrative — what moved this sprint, tied to the Q1 goal
    - What this unlocks — impact framing (bullet list)
-   - Risks / Gaps — dependencies and constraints, not alarmist
-   - Metrics — explicit targets with baselines
+   - Risks / Gaps / Asks — dependencies, constraints, and cross-functional requests
+   - Impact Signal — metrics with baselines and targets
    - Highlights — demos, deliverables, recordings/links
+   - What's Next — concrete next-sprint items; if no data found, include the section header with a note to fill in manually before sending
+   - Roadmap — table of roadmap objectives with Status and Progress updated from JIRA epic state via `roadmap_to_epic_mapping`
 3. ✅ Reviewers tagged and notified
 4. ✅ Link shared in Slack
 
@@ -198,22 +203,55 @@ User: "Build the CXI exec summary"
 ```markdown
 # CXI Executive Summary - March 19, 2026
 
-## 🎯 Key Highlights
-- Shipped support automation pipeline v2 (30% faster resolution)
-- Completed sprint review with zero critical bugs
-- Onboarded 3 new internal teams to Isaac
+## Q1 Goal
+Make DBSQL support executable: deliver the first usable, measurable agent-assisted
+investigation workflow for DBSQL.
 
-## 📊 This Sprint's Metrics
-- Features shipped: 4
-- Bugs closed: 12
-- Sprint velocity: 34 points (↑ 15% vs. last sprint)
+## TL;DR
+🟢 On Track — All roadmap items progressing; one ask pending from IT (Salesforce write access) but not blocking current sprint.
 
-## 🚧 Blockers & Risks
-- Dependency on platform team for API changes (Owner: @kevin, ETA: next sprint)
+## What Shipped
+Sprint 3 delivered Support Agent MCP integration and Merlin auto-collection for
+DBSQL workspace diagnostics.
 
-## 📅 Next Sprint
-- Isaac agent rollout to tier-2 support
-- Q1 metrics review with leadership
+What this unlocks:
+- TSEs can trigger diagnostic collection without manual steps
+- Isaac-based investigation is now measurable end-to-end
+
+### Ideas around Innovation from Support
+| Idea | Submitted By | Outcome |
+|------|-------------|---------|
+| Auto-collect DBSQL query plans on case creation | @jane-doe (FL DBSQL) | ✅ Shipped in Merlin v2 |
+| Custom diagnostic templates per product area | @john-smith (BL) | ⏸️ Not now — scope too broad for Q1; revisit in Q2 prioritization |
+
+Spotlight: @jane-doe's query plan gap feedback shaped Merlin's collection logic.
+
+## Impact Signal
+- TTM baseline: 5.1 days — targeting 5% improvement by end of Q1
+- AI SAT eval pass rate: 72% (↑ from 65% last sprint)
+
+## Risks / Gaps / Asks
+No material blockers. Key dependencies:
+- IT / BSE for Salesforce write integration
+
+Asks:
+- Ask (IT): Prioritize Salesforce write access by April 1 for Phase 2 rollout
+
+## Highlights
+March 16 demo with TSEs: Support Agent + TSE-facing evaluation UI for NBA,
+case summarization, similar cases and AI-SAT.
+
+## What's Next
+- Isaac agent rollout to tier-2 DBSQL support
+- Q1 metrics review with Sam
+
+## Roadmap
+| Roadmap Objective | Status | Progress |
+|-------------------|--------|----------|
+| Automatic Diagnostic Collection (DBSQL) | 🟢 On Track | Merlin v2 shipped; auto-collection live |
+| Governed Execution Plane | 🟡 At Risk | MCP integration PR in review; blocked on auth |
+| Isaac Investigation Surface | 🟢 On Track | Support Agent measurable end-to-end |
+| Support Tooling Backend Service | ⏸️ Deferred | Deprioritized for Q1; revisit Q2 |
 ```
 
 ---
