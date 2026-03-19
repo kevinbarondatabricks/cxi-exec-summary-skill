@@ -27,8 +27,7 @@ profiles:
     name: "Weekly Support"
     schedule: weekly
     audience: "Directors, TSE Managers, Shift Leads, Tech Leads, TSEs"
-    # TODO: Create Google Doc template for weekly support and add template_id here
-    template_id: ""
+    template_id: "1YxEC6ApaSIrSyzbFp9-8SjJZYpTiLBqWMzFgP20TP0c"
     markdown_template: "assets/templates/weekly-support-template.md"
     style_section: "Weekly Support Update Writing Style Guidance"
     title_format: "CXI Weekly Support Update - {date}"
